@@ -4,7 +4,7 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from settings import COLOR_WHITE
+from settings import COLOR_WHITE, DEBUG
 
 
 class Map:
@@ -13,38 +13,47 @@ class Map:
 
     
         self.object_images = {}
-        self.object_objects = []
-        self.objects = []
-
-        for layer in self.tmx_data.layers:
-            if layer.name == "objects":
-                for obj in layer:
-                    if hasattr(obj, 'gid'):
-                        image = self.tmx_data.get_tile_image_by_gid(obj.gid)
-                        if image:
-                            self.object_images[obj.gid] = image
-                            self.object_objects.append(obj)
-
+        self.map_objects = []
         self.tile_cache = {}
+        self.load_tile_images()
+        self.load_map_objects()
+
+        if (DEBUG):
+            self.collision_objects = []
+            self.load_collision_rects()
+
+
+
+
+    def load_collision_rects(self):
+        for layer in self.tmx_data.layers:
+            # Only check object layers
+            if isinstance(layer, pytmx.TiledObjectGroup) and layer.name == "collision":
+                for obj in layer:
+                    rect = pygame.Rect( obj.x,obj.y,getattr(obj, 'width', 0),getattr(obj, 'height', 0))
+                    self.collision_objects.append(rect)
+             
+
+    def load_tile_images(self):
         for gid in range(self.tmx_data.maxgid):
             image = self.tmx_data.get_tile_image_by_gid(gid)
             if image:
                 self.tile_cache[gid] = image
 
-        self.object_objects =  sorted(self.object_objects, key = lambda x: x.y )
 
-
-        self.collision_objects = []
-
-        # Iterate over layers
+    def load_map_objects(self):
         for layer in self.tmx_data.layers:
-            # Only check object layers
-            if isinstance(layer, pytmx.TiledObjectGroup) and layer.name == "collision":
-                for obj in layer:
-                    # obj is a TiledObject
-                    rect = pygame.Rect( obj.x,obj.y,getattr(obj, 'width', 0),getattr(obj, 'height', 0))
-                    self.collision_objects.append(rect)
-                    print(rect)
+                if layer.name == "objects":
+                    for obj in layer:
+                        if hasattr(obj, 'gid'):
+                            image = self.tmx_data.get_tile_image_by_gid(obj.gid)
+                            if image:
+                                self.object_images[obj.gid] = image
+                                self.map_objects.append(obj)
+
+
+        self.map_objects =  sorted(self.map_objects, key = lambda x: x.y )
+
 
 
     def get_map_width_pixels(self):
@@ -57,14 +66,17 @@ class Map:
 
         self.draw_layers(screen, camera)
         self.draw_objects(screen, camera, players)
+        
+        if (DEBUG):
+            self.draw_collision_rect()
 
+
+    def draw_collision_rect(self, screen, camera):
         for rect in self.collision_objects:
-
             draw_rect = rect.copy()
             draw_rect.x = rect.x - camera.x
             draw_rect.y = rect.y -  camera.y
             pygame.draw.rect(screen, COLOR_WHITE, draw_rect, 2)
-
 
     
     def draw_layers(self, screen, camera):
@@ -93,7 +105,7 @@ class Map:
         camera_rect = pygame.Rect(camera.x, camera.y, camera.width, camera.height)
         renderables = []
 
-        for obj in self.object_objects:
+        for obj in self.map_objects:
             if hasattr(obj, 'gid') and obj.gid in self.object_images:
                 image = self.object_images[obj.gid]
 

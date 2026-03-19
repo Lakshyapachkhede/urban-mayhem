@@ -8,7 +8,7 @@ import os
 import xml.etree.ElementTree as ET
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from settings import TILE_SIZE, MAP_SIZE, PLAYER_SPEED, SERVER_PORT, SERVER_URL, MAX_PACKET_SIZE, TICK_DELAY, MAP_FILE_PATH, PLAYER_SIZE
+from settings import TILE_SIZE, MAP_SIZE, PLAYER_SPEED, SERVER_PORT, SERVER_URL, MAX_PACKET_SIZE, TICK_DELAY, MAP_FILE_PATH, PLAYER_SIZE, DEBUG
 import traceback
 import pygame
 
@@ -27,8 +27,9 @@ class Server:
         self.lock = threading.Lock()
         self.map_collision_rects = []
         self.load_map_collision_rects()
-        for r in self.map_collision_rects:
-            print(r)
+        if DEBUG:
+            for r in self.map_collision_rects:
+                print(r)
         
         
         
@@ -118,7 +119,8 @@ class Server:
                             new_x = old_x + dx * PLAYER_SPEED
                             new_y = old_y + dy * PLAYER_SPEED
 
-                            new_rect = pygame.Rect(new_x, new_y, PLAYER_SIZE, PLAYER_SIZE)
+                            # new_rect = pygame.Rect(new_x, new_y + PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE // 2)
+                            new_rect = pygame.Rect(new_x, new_y , PLAYER_SIZE, PLAYER_SIZE)
 
          
                             if any(new_rect.colliderect(r) for r in self.map_collision_rects):

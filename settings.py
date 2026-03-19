@@ -49,6 +49,8 @@ TICK_DELAY          = 1 / NETWORK_FREQUENCY
 
 PLAYER_SPEED        = 2
 
+DEBUG = False
+
 
 
 

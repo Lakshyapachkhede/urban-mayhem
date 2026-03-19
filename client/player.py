@@ -48,7 +48,7 @@ class Player:
 
 
 
-    def move_to(self, new_x, new_y, lerp=0.02):
+    def move_to(self, new_x, new_y, lerp=0.002):
         if not self.alive:
             return
         
@@ -62,8 +62,10 @@ class Player:
             self.current_animation = ANIM_DOWN if dy > 0 else ANIM_UP
 
         # interpolate position
-        self.rect.x += dx * lerp
-        self.rect.y += dy * lerp
+        # self.rect.x += dx * lerp
+        self.rect.x += dx 
+        # self.rect.y += dy * lerp
+        self.rect.y += dy
 
    
 
