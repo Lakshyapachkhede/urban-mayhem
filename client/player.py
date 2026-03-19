@@ -26,7 +26,7 @@ class Player:
 
     
     def create_animations(self, player_color):
-        sprite_sheet = pygame.image.load("../assets/img/players.png").convert_alpha()
+        sprite_sheet = pygame.image.load(PLAYER_FILE_PATH).convert_alpha()
         animations = {}
 
         row_start = 0

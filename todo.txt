@@ -1,2 +1,2 @@
-1. Server collision check
+1. fix start screen code hardcoding
 2. shooting 

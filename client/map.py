@@ -62,13 +62,23 @@ class Map:
         return (map_width_pixels, map_height_pixels)
     
     
-    def render(self, screen, camera, players):
+    def render(self, screen, camera, players, font):
 
         self.draw_layers(screen, camera)
         self.draw_objects(screen, camera, players)
-        
+
         if (DEBUG):
             self.draw_collision_rect()
+
+        self.draw_player_names(screen, camera, players, font)
+
+
+        
+    def draw_player_names(self, screen, camera, players, font):
+        for p in players:
+            name_text = font.render(p.name, True, COLOR_WHITE)
+            screen.blit(name_text, (p.rect.x + p.rect.w // 2 - name_text.get_width() // 2 - camera.x, p.rect.y - 10 - camera.y))
+
 
 
     def draw_collision_rect(self, screen, camera):
